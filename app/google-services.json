@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "618255723391",
+    "firebase_url": "https://matsnbelts.firebaseio.com",
+    "project_id": "matsnbelts",
+    "storage_bucket": "matsnbelts.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:618255723391:android:d0efc45c23fd7284",
+        "android_client_info": {
+          "package_name": "com.example.matsnbeltsassociate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "618255723391-2ggn8g6f52agmnkq2cio97smjrnnnfca.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.matsnbeltsassociate",
+            "certificate_hash": "956b06e190c0a5dc4e3970d6ddc15dcb102f351d"
+          }
+        },
+        {
+          "client_id": "618255723391-bad4n1ono849gkt8uqi6ttb9f14po3nb.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvyv-cZtvo1v0wCETU-1wb76sDKtcTP_c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "618255723391-bad4n1ono849gkt8uqi6ttb9f14po3nb.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

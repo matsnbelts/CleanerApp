@@ -1,0 +1,36 @@
+{
+  "Associate" : {
+    "9952150922" : {
+      "Dates" : {
+        "18-06-2019" : {
+          "Cars" : {
+            "TN07CD2451" : {
+              "associateFeedback" : "DFDFD",
+              "cleaningStatus" : "Uncleaned",
+              "serviceType" : "Exterior"
+            },
+            "TN07CD2452" : {
+              "associateFeedback" : "DFDFD",
+              "cleaningStatus" : "Uncleaned",
+              "serviceType" : "Exterior"
+            },
+            "TN09R1342" : {
+              "associateFeedback" : "DFDFD",
+              "cleaningStatus" : "Uncleaned",
+              "serviceType" : "Exterior"
+            },
+            "TN14R0774" : {
+              "associateFeedback" : "DFDFD",
+              "cleaningStatus" : "Uncleaned",
+              "serviceType" : "Exterior"
+            }
+          }
+        }
+      },
+      "email" : "srinis@gmail.com",
+      "mobile" : "9952150922",
+      "password" : "srinis",
+      "serviceArea" : "Karapakkam"
+    }
+  }
+}
