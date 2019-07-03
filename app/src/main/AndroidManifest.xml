@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.matsnbeltsassociate">
+
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,15 +12,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".activity.MainActivity"/>
+        <activity android:name=".activity.NavigationActivity" />
+        <activity android:name=".activity.NetworkConnectivity" />
+        <activity android:name=".activity.MainActivity" />
         <activity
             android:name=".activity.ChooserActivity"
-            android:label="@string/title_activity_login">
-
-        </activity>
-        <!--<activity-->
-            <!--android:name=".activity.LoginActivity"-->
-            <!--android:label="@string/title_activity_login"></activity>-->
+            android:label="@string/title_activity_login" /> <!-- <activity -->
+        <!-- android:name=".activity.LoginActivity" -->
+        <!-- android:label="@string/title_activity_login"></activity> -->
         <activity android:name=".activity.LauncherActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,12 +27,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.CloseAppActivity"></activity>
-        <activity android:name=".activity.InfoPopupActivity"
-            android:theme="@style/AppTheme.PopMe"></activity>
+        <activity android:name=".activity.CloseAppActivity" />
+        <activity
+            android:name=".activity.InfoPopupActivity"
+            android:theme="@style/AppTheme.PopMe" />
         <activity
             android:name=".activity.PhoneAuthActivity"
-            android:label="@string/label_phone_auth"
+            android:label="@string/sign_in"
             android:windowSoftInputMode="adjustPan" />
     </application>
 

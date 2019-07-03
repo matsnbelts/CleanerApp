@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/edit_popup"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/info_popup_bg"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/customer_details"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="30dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/edit_clean_header"
+            style="@style/HeaderTextStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:layout_weight="1.0"
+            android:paddingBottom="20dp"
+
+            android:text="Done cleaning !!!" />
+
+        <TextView
+            android:id="@+id/edit_clean_msg"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="1dp"
+            android:layout_weight="1.0"
+            android:paddingBottom="20dp"
+
+            android:text="Leave any comments below. Clicking OK will end the cleaning and cannot be undone" />
+
+        <EditText
+            android:id="@+id/associate_feedback"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_margin="10dp"
+            android:layout_weight="1.0"
+            android:hint="CommentsSection." />
+
+        <CheckBox
+            android:id="@+id/chkCustomerAvailable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="false"
+            android:text="Customer Not Available" />
+
+        <LinearLayout
+            android:id="@+id/ccity_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:orientation="horizontal"
+            android:weightSum="2.0">
+
+            <Button
+                android:id="@+id/editCancel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="10dp"
+                android:text="Cancel"
+                android:theme="@style/ThemeOverlay.MyLightButton" />
+
+            <Button
+                android:id="@+id/editDone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="10dp"
+                android:text="Done"
+                android:theme="@style/ThemeOverlay.MyLightButton" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

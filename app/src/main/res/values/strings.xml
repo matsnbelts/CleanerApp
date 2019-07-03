@@ -63,7 +63,10 @@
     <string name="hint_password">Password</string>
     <string name="desc_firebase_lockup">Firebase logo and name</string>
     <string name="auth_failed">Authentication failed</string>
-    <string name="start_phone_auth">SendCode</string>
+    <string name="check_internet">Check Internet Connection</string>
+    <string name="customer_file">customer_file</string>
+    <string name="associate_file">associate_file</string>
+    <string name="start_phone_auth">Send Verification Code</string>
     <string name="verify_phone_auth">Verify</string>
     <string name="resend_phone_auth">Resend</string>
     <string name="hint_phone_number">Phone Number</string>
@@ -73,6 +76,7 @@
     <string name="status_verification_succeeded">Verification succeeded</string>
     <string name="status_sign_in_failed">Sign-in failed</string>
     <string name="instant_validation">(instant validation)</string>
+    <string name="no_data_available">No cars assigned yet today</string>
 
     <string name="firebase_status_fmt">Firebase User: %s</string>
     <string name="firebase_user_management">Firebase User Management</string>
@@ -105,4 +109,22 @@
 
     <string name="id_fmt">User ID: %s</string>
     <string name="email_fmt">Email: %s</string>
+    <string name="title_activity_navigation">NavigationActivity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Associate</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_apply_leave">Apply Leave</string>
+    <string name="menu_tools">Tools</string>
+    <string name="menu_profile">Profile</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_invite">Invite Friends</string>
+    <string name="menu_send">Send</string>
+    <string name="menu_supervisor">Supervisor Contact</string>
 </resources>

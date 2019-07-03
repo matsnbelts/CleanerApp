@@ -20,11 +20,9 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -255,11 +253,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                     intent.putExtra(LauncherActivity.EXTRA_MESSAGE, mobile);
                     startActivity(intent);
-                    return;
+                    finish();
                 } else if ( emailVerify && !pwdVerify ) {
                     mPasswordView.setError(getString(R.string.error_invalid_password));
                     mPasswordView.requestFocus();
-                    return;
                 } else{
                     showProgress(true);
                     createDB(email, pwd, mobile, serviceArea);
@@ -284,6 +281,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         intent.putExtra(LauncherActivity.EXTRA_MESSAGE, mobile);
         writeUserNametoLocalFile(mobile);
         startActivity(intent);
+        finish();
     }
 
     private void writeUserNametoLocalFile(String mobile) {
@@ -463,6 +461,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             Intent intent = new Intent(this, CloseAppActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
+            finish();
         }
 
         this.doubleBackToExitPressedOnce = true;

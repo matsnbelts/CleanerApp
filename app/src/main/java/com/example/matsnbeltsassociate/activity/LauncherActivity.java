@@ -8,10 +8,8 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.matsnbeltsassociate.R;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.example.matsnbeltsassociate.utils.InternalStorage;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -20,14 +18,16 @@ import java.io.IOException;
 public class LauncherActivity extends AppCompatActivity {
     public static final String fileName = "matsnbelts";
     public static final String EXTRA_MESSAGE = "com.example.matsnbelts.MESSAGE";
+    public static final String ASSOCIATE_ID = "AssociateId";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
         getApplicationContext().deleteFile(fileName);
-        //writeUserNametoLocalFile("9952150922");
+        writeUserNametoLocalFile("+919952150922");
         String uuId = readFile();
+        Log.i("UUUIDD ", uuId + LauncherActivity.class);
         if (!uuId.isEmpty()) {
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra(EXTRA_MESSAGE, uuId);
@@ -36,6 +36,7 @@ public class LauncherActivity extends AppCompatActivity {
             Intent intent = new Intent(this, PhoneAuthActivity.class);
             startActivity(intent);
         }
+        finish();
     }
     private void writeUserNametoLocalFile(String mobile) {
         FileOutputStream outputStream;
@@ -49,15 +50,10 @@ public class LauncherActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-    private boolean isFilePresent(String fileName) {
-        String path = getApplicationContext().getFilesDir().getAbsolutePath() + "/" + fileName;
-        File file = new File(path);
-        return file.exists();
-    }
 
     private String readFile() {
         String temp="";
-        if(!isFilePresent(fileName)) {
+        if (!InternalStorage.isFilePresent(getApplicationContext(), fileName)) {
             return temp;
         }
         FileInputStream inputStream;

@@ -1,5 +1,6 @@
 package com.example.matsnbeltsassociate.model;
 
+import java.io.Serializable;
 import java.util.Map;
 
 import lombok.Builder;
@@ -9,13 +10,12 @@ import lombok.ToString;
 @Builder
 @Getter
 @ToString
-public class Associate {
+public class Associate implements Serializable {
     private String name;
     private String email;
-    private String pwd;
-    private String mobile;
+    private String rating;
     private String serviceArea;
     private String today;
-    private Map<String, Map<String, String>> associateServiceCarMap;
+    private Map<String, CustomerCarDetails> associateServiceCarMap;
 
 }

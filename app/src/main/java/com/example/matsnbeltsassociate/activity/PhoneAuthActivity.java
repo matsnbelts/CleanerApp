@@ -5,6 +5,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -20,6 +22,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import com.example.matsnbeltsassociate.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -71,7 +74,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements
     private View mProgressView;
     private View mLoginFormView;
     //private TextView mStatusText;
-    //private TextView mDetailText;
+    private TextView mDetailText;
 
     private EditText mPhoneNumberField;
     private EditText mVerificationCodeField;
@@ -82,24 +85,47 @@ public class PhoneAuthActivity extends AppCompatActivity implements
     private Button mSignOutButton;
     private LinearLayout mVerifyLayout;
     private TextView mFieldAutoMsgText;
+    private String countryCode;
+
+    public static boolean isNetworkAvailable(Context con) {
+        try {
+            ConnectivityManager cm = (ConnectivityManager) con
+                    .getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+
+            if (networkInfo != null && networkInfo.isConnected()) {
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_phone_auth);
-
+        if (!isNetworkAvailable(getApplicationContext())) {
+            Intent intent = new Intent(getApplicationContext(), NetworkConnectivity.class);
+            Log.i("PhoneAuthActivity:::", "No network connection ");
+            intent.putExtra(LauncherActivity.EXTRA_MESSAGE, NetworkConnectivity.phoneAuth);
+            startActivity(intent);
+            finish();
+        }
         // Restore instance state
         if (savedInstanceState != null) {
             onRestoreInstanceState(savedInstanceState);
         }
-
+        final Toolbar mToolbar = findViewById(R.id.login_toolbar);
+        setSupportActionBar(mToolbar);
         // Assign views
         //mPhoneNumberViews = findViewById(R.id.phoneAuthFields);
         mSignedInViews = findViewById(R.id.signedInButtons);
 
         //mStatusText = findViewById(R.id.status);
         //mDetailText = findViewById(R.id.detail);
-
+        countryCode = ((TextView) findViewById(R.id.country_code)).getText().toString();
         mPhoneNumberField = findViewById(R.id.mobileno);
         mVerificationCodeField = findViewById(R.id.fieldVerificationCode);
         mVerificationCodeField.setVisibility(View.INVISIBLE);
@@ -196,21 +222,6 @@ public class PhoneAuthActivity extends AppCompatActivity implements
             }
         };
         // [END phone_auth_callbacks]
-    }
-
-    // [START on_start_check_user]
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        updateUI(currentUser);
-
-        // [START_EXCLUDE]
-        if (mVerificationInProgress && validatePhoneNumber()) {
-            startPhoneNumberVerification(mPhoneNumberField.getText().toString());
-        }
-        // [END_EXCLUDE]
     }
     // [END on_start_check_user]
 
@@ -318,90 +329,27 @@ public class PhoneAuthActivity extends AppCompatActivity implements
         updateUI(uiState, null, cred);
     }
 
-    private void updateUI(int uiState, FirebaseUser user, PhoneAuthCredential cred) {
-        switch (uiState) {
-            case STATE_INITIALIZED:
-                // Initialized state, show only the phone number field and start button
-                enableViews(mStartButton, mPhoneNumberField);
-                mVerifyLayout.setVisibility(View.VISIBLE);
-                mFieldAutoMsgText.setVisibility(View.VISIBLE);
-                hideViews(mVerifyLayout, mFieldAutoMsgText, mVerificationCodeField);
-                //disableViews(mVerifyButton, mResendButton, mVerificationCodeField);
-                //mDetailText.setText(null);
-                break;
-            case STATE_CODE_SENT:
-                // Code sent state, show the verification field, the
-                showViews(mVerifyLayout, mFieldAutoMsgText, mVerificationCodeField);
-                enableViews(mVerifyButton, mResendButton, mPhoneNumberField, mVerificationCodeField);
-                disableViews(mStartButton);
-                //mDetailText.setText(R.string.status_code_sent);
-                Snackbar snackbar = Snackbar
-                        .make(findViewById(R.id.main_layout), R.string.status_code_sent, Snackbar.LENGTH_LONG);
-                snackbar.show();
-                break;
-            case STATE_VERIFY_FAILED:
-                // Verification has failed, show all options
-                enableViews(mStartButton, mVerifyButton, mResendButton, mPhoneNumberField,
-                        mVerificationCodeField);
-                //mDetailText.setText(R.string.status_verification_failed);
-                snackbar = Snackbar
-                        .make(findViewById(R.id.main_layout), R.string.status_verification_failed, Snackbar.LENGTH_LONG);
-                snackbar.show();
-                break;
-            case STATE_VERIFY_SUCCESS:
-                // Verification has succeeded, proceed to firebase sign in
-                disableViews(mStartButton, mVerifyButton, mResendButton, mPhoneNumberField,
-                        mVerificationCodeField);
-                //mDetailText.setText(R.string.status_verification_succeeded);
-                snackbar = Snackbar
-                        .make(findViewById(R.id.main_layout), R.string.status_verification_succeeded, Snackbar.LENGTH_LONG);
-                snackbar.show();
-
-                // Set the verification text based on the credential
-                if (cred != null) {
-                    if (cred.getSmsCode() != null) {
-                        mVerificationCodeField.setText(cred.getSmsCode());
-                    } else {
-                        mVerificationCodeField.setText(R.string.instant_validation);
-                    }
-                }
-
-                break;
-            case STATE_SIGNIN_FAILED:
-                // No-op, handled by sign-in check
-                snackbar = Snackbar
-                        .make(findViewById(R.id.main_layout), R.string.status_sign_in_failed, Snackbar.LENGTH_LONG);
-                snackbar.show();
-                break;
-            case STATE_SIGNIN_SUCCESS:
-                // Np-op, handled by sign-in check
-                break;
+    // [START on_start_check_user]
+    @Override
+    public void onStart() {
+        super.onStart();
+        Context context = getApplicationContext();
+        if (!PhoneAuthActivity.isNetworkAvailable(context)) {
+            Intent network_intent = new Intent(context, NetworkConnectivity.class);
+            Log.i("PhoneAuthActivity:::", "No network connection ");
+            network_intent.putExtra(LauncherActivity.EXTRA_MESSAGE, NetworkConnectivity.phoneAuth);
+            startActivity(network_intent);
+            finish();
         }
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        updateUI(currentUser);
 
-        if (user == null) {
-            // Signed out
-           // mPhoneNumberViews.setVisibility(View.VISIBLE);
-            mSignedInViews.setVisibility(View.GONE);
-
-            //mStatusText.setText(R.string.signed_out);
-        } else {
-            // Signed in
-            //mPhoneNumberViews.setVisibility(View.GONE);
-            mSignedInViews.setVisibility(View.VISIBLE);
-
-
-
-            //mStatusText.setText(R.string.signed_in);
-            //mDetailText.setText(getString(R.string.firebase_status_fmt, user.getUid()));
-            showProgress(true);
-            final String mobile = mPhoneNumberField.getText().toString();
-            writeUserNametoLocalFile(mobile);
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            intent.putExtra(LauncherActivity.EXTRA_MESSAGE, mobile);
-            Log.i("PhoneAuthActivity:::", "Starting with " + mobile);
-            startActivity(intent);
-            return;
+        // [START_EXCLUDE]
+        if (mVerificationInProgress && validatePhoneNumber()) {
+            startPhoneNumberVerification(countryCode + mPhoneNumberField.getText().toString());
         }
+        // [END_EXCLUDE]
     }
 
     /**
@@ -412,7 +360,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements
         // On Honeycomb MR2 we have the ViewPropertyAnimator APIs, which allow
         // for very easy animations. If available, use these APIs to fade-in
         // the progress spinner.
-        if ( Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2 ) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
             mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
@@ -488,7 +436,94 @@ public class PhoneAuthActivity extends AppCompatActivity implements
         }
     }
 
+    private void updateUI(int uiState, FirebaseUser user, PhoneAuthCredential cred) {
+        switch (uiState) {
+            case STATE_INITIALIZED:
+                // Initialized state, show only the phone number field and start button
+                enableViews(mStartButton, mPhoneNumberField);
+                mVerifyLayout.setVisibility(View.VISIBLE);
+                mFieldAutoMsgText.setVisibility(View.VISIBLE);
+                hideViews(mVerifyLayout, mFieldAutoMsgText, mVerificationCodeField);
+                //disableViews(mVerifyButton, mResendButton, mVerificationCodeField);
+                //mDetailText.setText(null);
+                break;
+            case STATE_CODE_SENT:
+                // Code sent state, show the verification field, the
+                showViews(mVerifyLayout, mFieldAutoMsgText, mVerificationCodeField);
+                enableViews(mVerifyButton, mResendButton, mPhoneNumberField, mVerificationCodeField);
+                disableViews(mStartButton);
+                //mDetailText.setText(R.string.status_code_sent);
+                Snackbar snackbar = Snackbar
+                        .make(findViewById(R.id.main_layout), R.string.status_code_sent, Snackbar.LENGTH_LONG);
+                snackbar.show();
+                break;
+            case STATE_VERIFY_FAILED:
+                // Verification has failed, show all options
+                enableViews(mStartButton, mVerifyButton, mResendButton, mPhoneNumberField,
+                        mVerificationCodeField);
+                //mDetailText.setText(R.string.status_verification_failed);
+                snackbar = Snackbar
+                        .make(findViewById(R.id.main_layout), R.string.status_verification_failed, Snackbar.LENGTH_LONG);
+                snackbar.show();
+                break;
+            case STATE_VERIFY_SUCCESS:
+                // Verification has succeeded, proceed to firebase sign in
+                disableViews(mStartButton, mVerifyButton, mResendButton, mPhoneNumberField,
+                        mVerificationCodeField);
+                //mDetailText.setText(R.string.status_verification_succeeded);
+                snackbar = Snackbar
+                        .make(findViewById(R.id.main_layout), R.string.status_verification_succeeded, Snackbar.LENGTH_LONG);
+                snackbar.show();
+
+                // Set the verification text based on the credential
+                if (cred != null) {
+                    if (cred.getSmsCode() != null) {
+                        mVerificationCodeField.setText(cred.getSmsCode());
+                    } else {
+                        mVerificationCodeField.setText(R.string.instant_validation);
+                    }
+                }
+
+                break;
+            case STATE_SIGNIN_FAILED:
+                // No-op, handled by sign-in check
+                snackbar = Snackbar
+                        .make(findViewById(R.id.main_layout), R.string.status_sign_in_failed, Snackbar.LENGTH_LONG);
+                snackbar.show();
+                break;
+            case STATE_SIGNIN_SUCCESS:
+                // Np-op, handled by sign-in check
+                break;
+        }
+
+        if (user == null) {
+            // Signed out
+           // mPhoneNumberViews.setVisibility(View.VISIBLE);
+            mSignedInViews.setVisibility(View.GONE);
+
+            //mStatusText.setText(R.string.signed_out);
+        } else {
+            // Signed in
+            //mPhoneNumberViews.setVisibility(View.GONE);
+            //mSignedInViews.setVisibility(View.VISIBLE);
+
+
+
+            //mStatusText.setText(R.string.signed_in);
+            //mDetailText.setText(getString(R.string.firebase_status_fmt, user.getUid()));
+            showProgress(true);
+            final String mobile = "+91" + mPhoneNumberField.getText().toString();
+            writeUserNametoLocalFile(mobile);
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            intent.putExtra(LauncherActivity.EXTRA_MESSAGE, mobile);
+            Log.i("PhoneAuthActivity:::", "Starting with " + mobile);
+            startActivity(intent);
+            finish();
+        }
+    }
+
     private boolean verifyUserInDB(final String mobile) {
+
         DatabaseReference associateRef = FirebaseDatabase.getInstance().getReference("Associate").child(mobile);
         associateRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -519,7 +554,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements
 
     @Override
     public void onClick(View view) {
-        final String phoneNumber = mPhoneNumberField.getText().toString();
+        final String phoneNumber = "+91" + mPhoneNumberField.getText().toString();
         switch (view.getId()) {
             case R.id.buttonStartVerification:
                 Log.i("PhoneAuthActivity:::: ", " : " + phoneNumber);
@@ -550,6 +585,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements
             Intent intent = new Intent(this, CloseAppActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
+            finish();
         }
 
         this.doubleBackToExitPressedOnce = true;
