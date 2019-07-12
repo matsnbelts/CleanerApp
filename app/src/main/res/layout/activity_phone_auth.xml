@@ -26,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1.0"
             android:enabled="false"
-            android:hint="+91" />
+            android:hint="@string/mobile_country_code" />
     <EditText
         android:id="@+id/mobileno"
         android:layout_width="0dp"
@@ -109,20 +109,20 @@
                 <Button
                     android:theme="@style/ThemeOverlay.MyDarkButton"
                     style="@style/Widget.AppCompat.Button.Colored"
+                    android:id="@+id/buttonResend"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1.0"
+                    android:text="@string/resend_phone_auth"/>
+                <Button
+                    android:theme="@style/ThemeOverlay.MyDarkButton"
+                    style="@style/Widget.AppCompat.Button.Colored"
                     android:id="@+id/buttonVerifyPhone"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1.0"
                     android:text="@string/verify_phone_auth"/>
 
-                <Button
-                    android:theme="@style/ThemeOverlay.MyDarkButton"
-                    style="@style/Widget.AppCompat.Button.Colored"
-                    android:id="@+id/buttonResend"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1.0"
-                    android:text="@string/resend_phone_auth"/>
             </LinearLayout>
 
         </LinearLayout>

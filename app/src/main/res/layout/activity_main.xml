@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/app_bar_height"
         android:fitsSystemWindows="true"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:theme="@style/AppTheme.LoginAppBar">
     <com.google.android.material.appbar.CollapsingToolbarLayout
         android:id="@+id/toolbar_layout"
         android:layout_width="match_parent"
@@ -33,39 +33,45 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:weightSum="3.0">
+                android:weightSum="2.0">
 
-                <LinearLayout
-                    android:id="@+id/aname_inner_layout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="2.0"
-                    android:orientation="vertical"
-                    android:weightSum="2.0">
+                <!--<LinearLayout-->
+                    <!--android:id="@+id/aname_inner_layout"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_weight="2.0"-->
+                    <!--android:orientation="vertical"-->
+                    <!--android:weightSum="2.0">-->
+                <!--<TextView-->
+                    <!--android:id="@+id/associate_name"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="0dp"-->
+                    <!--android:layout_marginStart="10dp"-->
+                    <!--android:textColor="@color/colorWhite"-->
+                    <!--android:layout_marginLeft="10dp"-->
+                    <!--android:layout_weight="1.0"-->
+                    <!--android:text=""-->
+                    <!--android:textStyle="bold"-->
+                    <!--android:textSize="22sp" />-->
+
+                <!--</LinearLayout>-->
                 <TextView
                     android:id="@+id/associate_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="0dp"
-                    android:layout_marginStart="10dp"
-                    android:textColor="@color/colorWhite"
-                    android:layout_marginLeft="10dp"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
                     android:layout_weight="1.0"
                     android:text=""
-                    android:textStyle="bold"
-                    android:textSize="22sp" />
-
-                </LinearLayout>
-
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
                 <TextView
                     android:id="@+id/associate_today"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:layout_marginStart="1dp"
-                    android:layout_marginLeft="1dp"
                     android:layout_weight="1.0"
                     android:text=""
-                    android:textSize="12sp"
+                    android:textSize="13sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -76,7 +82,7 @@
                 android:orientation="horizontal"
                 android:weightSum="2.0">
                 <TextView
-                    android:id="@+id/associate_area"
+                    android:id="@+id/associate_apartment"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -86,7 +92,7 @@
                     android:textStyle="bold"
                     android:textSize="16sp" />
                 <TextView
-                    android:id="@+id/associate_apartment"
+                    android:id="@+id/associate_area"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
@@ -238,6 +244,13 @@
 
     </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
-
+    <!-- DB Fetch progress -->
+    <ProgressBar
+        android:id="@+id/firestore_progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone" />
     <include layout="@layout/content_layout" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

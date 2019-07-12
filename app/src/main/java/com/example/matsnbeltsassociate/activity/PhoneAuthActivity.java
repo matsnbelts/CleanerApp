@@ -25,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import com.example.matsnbeltsassociate.R;
+import com.example.matsnbeltsassociate.utils.CloudStoreHelper;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
@@ -36,11 +37,6 @@ import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.PhoneAuthCredential;
 import com.google.firebase.auth.PhoneAuthProvider;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.io.FileOutputStream;
 import java.util.concurrent.TimeUnit;
@@ -82,7 +78,6 @@ public class PhoneAuthActivity extends AppCompatActivity implements
     private Button mStartButton;
     private Button mVerifyButton;
     private Button mResendButton;
-    private Button mSignOutButton;
     private LinearLayout mVerifyLayout;
     private TextView mFieldAutoMsgText;
     private String countryCode;
@@ -135,7 +130,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements
         mStartButton = findViewById(R.id.buttonStartVerification);
         mVerifyButton = findViewById(R.id.buttonVerifyPhone);
         mResendButton = findViewById(R.id.buttonResend);
-        mSignOutButton = findViewById(R.id.signOutButton);
+        Button mSignOutButton = findViewById(R.id.signOutButton);
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
         mFieldAutoMsgText = findViewById(R.id.fieldPhoneNumber);
@@ -238,7 +233,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements
     }
 
 
-    private void startPhoneNumberVerification(String phoneNumber) {
+    public void startPhoneNumberVerification(String phoneNumber) {
         // [START start_phone_auth]
         PhoneAuthProvider.getInstance().verifyPhoneNumber(
                 phoneNumber,        // Phone number to verify
@@ -280,11 +275,15 @@ public class PhoneAuthActivity extends AppCompatActivity implements
                         if (task.isSuccessful()) {
                             // Sign in success, update UI with the signed-in user's information
                             Log.d(TAG, "signInWithCredential:success");
-
-                            FirebaseUser user = task.getResult().getUser();
-                            // [START_EXCLUDE]
-                            updateUI(STATE_SIGNIN_SUCCESS, user);
-                            // [END_EXCLUDE]
+                            if(task.getResult() == null) {
+                                updateUI(STATE_SIGNIN_FAILED);
+                            }
+                            else {
+                                FirebaseUser user = task.getResult().getUser();
+                                // [START_EXCLUDE]
+                                updateUI(STATE_SIGNIN_SUCCESS, user);
+                                // [END_EXCLUDE]
+                            }
                         } else {
                             // Sign in failed, display a message and update the UI
                             Log.w(TAG, "signInWithCredential:failure", task.getException());
@@ -388,7 +387,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements
         }
     }
 
-    private boolean validatePhoneNumber() {
+    public boolean validatePhoneNumber() {
         String phoneNumber = mPhoneNumberField.getText().toString();
         if (TextUtils.isEmpty(phoneNumber)) {
             mPhoneNumberField.setError("Invalid phone number.");
@@ -512,7 +511,7 @@ public class PhoneAuthActivity extends AppCompatActivity implements
             //mStatusText.setText(R.string.signed_in);
             //mDetailText.setText(getString(R.string.firebase_status_fmt, user.getUid()));
             showProgress(true);
-            final String mobile = "+91" + mPhoneNumberField.getText().toString();
+            final String mobile = getResources().getString(R.string.mobile_country_code) + mPhoneNumberField.getText().toString();
             writeUserNametoLocalFile(mobile);
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             intent.putExtra(LauncherActivity.EXTRA_MESSAGE, mobile);
@@ -522,43 +521,23 @@ public class PhoneAuthActivity extends AppCompatActivity implements
         }
     }
 
-    private boolean verifyUserInDB(final String mobile) {
-
-        DatabaseReference associateRef = FirebaseDatabase.getInstance().getReference("Associate").child(mobile);
-        associateRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                if (!snapshot.exists()) {
-                    mPhoneNumberField.setError("Not a registered Mobile Number");
-                    mPhoneNumberField.requestFocus();
-                    return;
-                }
-                if (!validatePhoneNumber()) {
-                    return;
-                }
-                startPhoneNumberVerification(mobile);
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError databaseError) {
-
-            }
-        });
-        if(associateRef == null) {
-            mPhoneNumberField.setError("Not a registered Mobile Number");
-            mPhoneNumberField.requestFocus();
-            return false;
-        }
-        return true;
+    public EditText getmPhoneNumberField() {
+        return mPhoneNumberField;
     }
 
     @Override
     public void onClick(View view) {
-        final String phoneNumber = "+91" + mPhoneNumberField.getText().toString();
+        final String phoneNumber = getResources().getString(R.string.mobile_country_code) + mPhoneNumberField.getText().toString();
         switch (view.getId()) {
             case R.id.buttonStartVerification:
                 Log.i("PhoneAuthActivity:::: ", " : " + phoneNumber);
-                verifyUserInDB(phoneNumber);
+                if (!PhoneAuthActivity.isNetworkAvailable(getApplicationContext())) {
+                    Log.d(TAG, "No internet connection on verify mobile number in db");
+                    mPhoneNumberField.setError("Check Internet Connection");
+                    mPhoneNumberField.requestFocus();
+                } else {
+                    CloudStoreHelper.getInstance().doesAssociateExist(phoneNumber, this);
+                }
                 break;
             case R.id.buttonVerifyPhone:
                 String code = mVerificationCodeField.getText().toString();

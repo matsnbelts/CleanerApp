@@ -1,14 +1,13 @@
 package com.example.matsnbeltsassociate.activity;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,9 +31,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.matsnbeltsassociate.R;
 import com.example.matsnbeltsassociate.model.Associate;
-import com.example.matsnbeltsassociate.model.CustomerCar;
+import com.example.matsnbeltsassociate.model.CustomerCarDetails;
+import com.example.matsnbeltsassociate.model.CustomerFireStoreModel;
+import com.example.matsnbeltsassociate.utils.CloudStoreHelper;
 import com.example.matsnbeltsassociate.utils.CommonUtils;
-import com.example.matsnbeltsassociate.utils.FireBaseHelper;
 import com.example.matsnbeltsassociate.utils.InternalStorage;
 import com.example.matsnbeltsassociate.utils.LocalDataFetcher;
 import com.google.android.material.appbar.AppBarLayout;
@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
     private static final String TAG = "MainActivityLog";
     private RecyclerView recyclerView;
-    private RecyclerView.LayoutManager layoutManager;
     CoordinatorLayout coordinatorLayout;
     ActionBar supportActionBar;
     private TextView associateNameTextView;
@@ -54,6 +53,7 @@ public class MainActivity extends AppCompatActivity
     private boolean doubleBackToExitPressedOnce = false;
     private Context context;
     private String userId = "";
+    private View mProgressView;
 
     public String getAssociateId() {
         return userId;
@@ -97,6 +97,7 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
+        mProgressView = findViewById(R.id.firestore_progress);
 
         ///////////////////////////////////
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -112,12 +113,10 @@ public class MainActivity extends AppCompatActivity
         context = getApplicationContext();
         View a = navigationView.getHeaderView(0);
         associateNameTextView = a.findViewById(R.id.nav_header_title);
-        Log.i(TAG, "ddddddertewrtewr: " + associateNameTextView.getText().toString());
         associateRating = a.findViewById(R.id.star_rating);
-//        final Toolbar mToolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(mToolbar);
         supportActionBar = this.getSupportActionBar();
-        supportActionBar.setTitle(" ");
+        if(supportActionBar != null)
+            supportActionBar.setTitle(" ");
         coordinatorLayout = findViewById(R.id.constraintLayout);
         AppBarLayout appBarLayout = findViewById(R.id.app_bar);
         final CollapsingToolbarLayout collapseBarLayout = findViewById(R.id.toolbar_layout);
@@ -133,20 +132,9 @@ public class MainActivity extends AppCompatActivity
                 if (scrollRange + verticalOffset == 0) {
                     isShow = true;
                     collapseBarLayout.setTitle(getResources().getString(R.string.app_name));
-
                 } else if (isShow) {
                     isShow = false;
                     collapseBarLayout.setTitle(" ");
-//                    TextView associateContactView = findViewById(R.id.associateContactextView);
-//                    if(htmlText != null) {
-//                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-//                            associateContactView.setText(Html.fromHtml(htmlText, Html.FROM_HTML_MODE_COMPACT));
-//                        } else {
-//                            associateContactView.setText(Html.fromHtml(htmlText));
-//                        }
-//                    } else {
-//                        associateContactView.setText("MATS N BELTS");
-//                    }
                 }
             }
         });
@@ -158,13 +146,10 @@ public class MainActivity extends AppCompatActivity
         recyclerView.setHasFixedSize(false);
 
         // use a linear layout manager
-        layoutManager = new LinearLayoutManager(this);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-//        //recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, dpToPx(10), true));
-//        //recyclerView.setItemAnimator(new DefaultItemAnimator());
         populateAssociateDetailsInView();
     }
-
 
     private void populateAssociateDetailsInView() {
         Intent intent = getIntent();
@@ -179,7 +164,7 @@ public class MainActivity extends AppCompatActivity
         }
         //isnetWork - load data from db
         if (PhoneAuthActivity.isNetworkAvailable(context)) {
-            FireBaseHelper.getInstance().fetchAssociateDetails(userId, this);
+            CloudStoreHelper.getInstance().fetchAssociateDetails(userId, this);
         } else if (InternalStorage.checkCacheFileForToday(context, context.getResources().getString(R.string.associate_file))) {
             LocalDataFetcher.getInstance().fetchAssociateDetails(this);
             Snackbar snackbar = Snackbar
@@ -203,11 +188,6 @@ public class MainActivity extends AppCompatActivity
     public void populateAssociateContactTextView(Associate associate) {
         TextView associateApartmentText = findViewById(R.id.associate_area);
         associateApartmentText.setText(associate.getServiceArea());
-        TextView associateCarsAssignedText = findViewById(R.id.associate_cars_assigned);
-        associateCarsAssignedText.setText("Cars Assigned: " + associate.getAssociateServiceCarMap().size() + "");
-//        TextView associateMobileText = findViewById(R.id.associate_mobile);
-//        associateMobileText.setText(associate.getMobile());
-        //TextView associateNameTextView = findViewById(R.id.associate_name);
         associateNameTextView.setText(associate.getName());
         associateRating.setText(associate.getRating());
         TextView associateTodayText = findViewById(R.id.associate_today);
@@ -215,14 +195,13 @@ public class MainActivity extends AppCompatActivity
     }
 
 
-    public void inflatePopupInfo(CustomerCar customerCar) {
+    public void inflatePopupInfo(CustomerFireStoreModel customerCar, CustomerCarDetails customerCarDetails, final String carNo) {
         LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
 
         // Inflate the custom layout/view
         final PopupWindow popup;
         View customerInfoView;
-        customerInfoView = inflater.inflate(R.layout.popup,null);
+        customerInfoView = inflater.inflate(R.layout.popup, null);
         popup = new PopupWindow(
                 customerInfoView,
                 WindowManager.LayoutParams.MATCH_PARENT,
@@ -232,34 +211,38 @@ public class MainActivity extends AppCompatActivity
         popup.setFocusable(true);
         // Set an elevation value for popup window
         // Call requires API level 21
-        if(Build.VERSION.SDK_INT>=21){
+        if (Build.VERSION.SDK_INT >= 21) {
             popup.setElevation(20);
         }
-//        customerDetailsTextView.setText();
         // Get a reference for the custom view close button
         Button closeButton = customerInfoView.findViewById(R.id.btnClose);
 
         // Set a click listener for the popup window close button
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Dismiss the popup window
-                popup.dismiss();
-            }
+        closeButton.setOnClickListener(view -> {
+            // Dismiss the popup window
+            popup.dismiss();
         });
         popup.showAtLocation(coordinatorLayout, Gravity.FILL_HORIZONTAL, 0, 0);
-        setCustomerDetailsInfoView(customerInfoView, customerCar);
+        setCustomerDetailsInfoView(customerInfoView, customerCar, customerCarDetails, carNo);
+        showProgress(false);
     }
 
-    private void setCustomerDetailsInfoView(View customerInfoView, CustomerCar customerCar) {
+    private void setCustomerDetailsInfoView(View customerInfoView, CustomerFireStoreModel customerCar, CustomerCarDetails customerCarDetails, final String carNo) {
         ((TextView) customerInfoView.findViewById(R.id.customer_name)).setText(customerCar.getName());
-        ((TextView) customerInfoView.findViewById(R.id.customer_number)).setText(customerCar.getCustomer_number());
-        ((TextView) customerInfoView.findViewById(R.id.car_service_type)).setText(customerCar.getServiceType());
-        ((TextView) customerInfoView.findViewById(R.id.car_model)).setText(customerCar.getModel());
-        ((TextView) customerInfoView.findViewById(R.id.car_size)).setText(customerCar.getSize());
+        ((TextView) customerInfoView.findViewById(R.id.customer_number)).setText(customerCar.getMobile());
+        ((TextView) customerInfoView.findViewById(R.id.car_service_type)).setText(customerCarDetails.getServiceType());
         ((TextView) customerInfoView.findViewById(R.id.car_area)).setText(customerCar.getArea());
         ((TextView) customerInfoView.findViewById(R.id.car_apartment)).setText(customerCar.getApartment());
-        ((TextView) customerInfoView.findViewById(R.id.car_city)).setText(customerCar.getCity());
+        ((TextView) customerInfoView.findViewById(R.id.car_area)).setText(customerCar.getArea());
+        if(customerCar.getCars().get(carNo) != null) {
+            ((TextView) customerInfoView.findViewById(R.id.car_model)).setText(customerCar.getCars().get(carNo).getModel());
+            ((TextView) customerInfoView.findViewById(R.id.car_size)).setText(customerCar.getCars().get(carNo).getType());
+            ((TextView) customerInfoView.findViewById(R.id.car_city)).setText(customerCar.getCars().get(carNo).getPack());
+        } else {
+            Snackbar snackbar = Snackbar
+                    .make(coordinatorLayout, "Could not fetch car details", Snackbar.LENGTH_LONG);
+            snackbar.show();
+        }
         customerInfoView.findViewById(R.id.loading_customer).setVisibility(View.GONE);
         customerInfoView.findViewById(R.id.customer_details).setVisibility(View.VISIBLE);
     }
@@ -285,24 +268,16 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void run() {
-                doubleBackToExitPressedOnce=false;
+                doubleBackToExitPressedOnce = false;
             }
         }, 2000);
-    }
-
-    /**
-     * Converting dp to pixel
-     */
-    private int dpToPx(int dp) {
-        Resources r = getResources();
-        return Math.round(TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, r.getDisplayMetrics()));
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.navigation, menu);
-        return true;
+        //getMenuInflater().inflate(R.menu.navigation, menu);
+        return false;
     }
 
     @Override
@@ -341,40 +316,27 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * RecyclerView item decoration - give equal margin around grid itemø
+     * Shows the progress UI and hides the mainactivity.
      */
-    public class GridSpacingItemDecoration extends RecyclerView.ItemDecoration {
+    public void showProgress(final boolean show) {
+        int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-        private int spanCount;
-        private int spacing;
-        private boolean includeEdge;
-
-        public GridSpacingItemDecoration(int spanCount, int spacing, boolean includeEdge) {
-            this.spanCount = spanCount;
-            this.spacing = spacing;
-            this.includeEdge = includeEdge;
-        }
-
-        @Override
-        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
-            int position = parent.getChildAdapterPosition(view); // item position
-            int column = position % spanCount; // item column
-
-            if (includeEdge) {
-                outRect.left = spacing - column * spacing / spanCount; // spacing - column * ((1f / spanCount) * spacing)
-                outRect.right = (column + 1) * spacing / spanCount; // (column + 1) * ((1f / spanCount) * spacing)
-
-                if (position < spanCount) { // top edge
-                    outRect.top = spacing;
-                }
-                outRect.bottom = spacing; // item bottom
-            } else {
-                outRect.left = column * spacing / spanCount; // column * ((1f / spanCount) * spacing)
-                outRect.right = spacing - (column + 1) * spacing / spanCount; // spacing - (column + 1) * ((1f /    spanCount) * spacing)
-                if (position >= spanCount) {
-                    outRect.top = spacing; // item top
-                }
+        coordinatorLayout.setVisibility(show ? View.GONE : View.VISIBLE);
+        coordinatorLayout.animate().setDuration(shortAnimTime).alpha(
+                show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                coordinatorLayout.setVisibility(show ? View.GONE : View.VISIBLE);
             }
-        }
+        });
+
+        mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+        mProgressView.animate().setDuration(shortAnimTime).alpha(
+                show ? 1 : 0).setListener(new AnimatorListenerAdapter() {
+            @Override
+            public void onAnimationEnd(Animator animation) {
+                mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
+            }
+        });
     }
 }

@@ -14,6 +14,7 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="mobile_country_code">+91</string>
     <string name="title_activity_login">Sign in</string>
 
     <string name="label_google_sign_in">Firebase + Google Sign In</string>

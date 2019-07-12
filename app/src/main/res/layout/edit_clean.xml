@@ -64,7 +64,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="10dp"
                 android:text="Cancel"
-                android:theme="@style/ThemeOverlay.MyLightButton" />
+                android:theme="@style/ThemeOverlay.MyDarkButton" />
 
             <Button
                 android:id="@+id/editDone"
@@ -73,7 +73,7 @@
                 android:layout_gravity="center_horizontal"
                 android:layout_margin="10dp"
                 android:text="Done"
-                android:theme="@style/ThemeOverlay.MyLightButton" />
+                android:theme="@style/ThemeOverlay.MyDarkButton" />
         </LinearLayout>
     </LinearLayout>
 </LinearLayout>

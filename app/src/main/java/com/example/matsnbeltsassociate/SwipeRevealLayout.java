@@ -194,9 +194,9 @@ public class SwipeRevealLayout extends ViewGroup {
 
             if (childParams != null) {
                 matchParentHeight = (childParams.height == LayoutParams.MATCH_PARENT) ||
-                        (childParams.height == LayoutParams.FILL_PARENT);
+                        (childParams.height == LayoutParams.MATCH_PARENT);
                 matchParentWidth = (childParams.width == LayoutParams.MATCH_PARENT) ||
-                        (childParams.width == LayoutParams.FILL_PARENT);
+                        (childParams.width == LayoutParams.MATCH_PARENT);
             }
 
             if (matchParentHeight) {

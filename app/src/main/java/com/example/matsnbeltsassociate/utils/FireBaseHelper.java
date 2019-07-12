@@ -58,7 +58,7 @@ public class FireBaseHelper {
         return firebaseInstance.getReference("ServiceHistory").child(CommonUtils.today()).child("Cars").child(carNo).getRef();
     }
 
-    private DatabaseReference getAssociateReference(String userID) {
+    public DatabaseReference getAssociateReference(String userID) {
         Log.i(TAG, userID + " :uuuu: " + firebaseInstance.toString());
         return firebaseInstance.getReference("Associate").child(userID).getRef();
     }
@@ -231,7 +231,7 @@ public class FireBaseHelper {
                 customerCarBuilder.city(dataSnapshot.child("city").getValue(String.class));
                 customerCarBuilder.serviceType(customerCarDetails.getServiceType());
                 // cache customer car details
-                mainActivity.inflatePopupInfo(customerCarBuilder.build());
+                //mainActivity.inflatePopupInfo(customerCarBuilder.build());
             }
 
             @Override
@@ -280,12 +280,12 @@ public class FireBaseHelper {
 
                 for (Map.Entry<String, Map<String, String>> associateServiceCarMapEntry : associateServiceCarMap.entrySet()) {
                     String carNo = associateServiceCarMapEntry.getKey();
-                    CustomerCarDetails.CustomerCarDetailsBuilder customerCarDetailsBuilder = CustomerCarDetails.builder();
-                    Map<String, String> carMap = associateServiceCarMapEntry.getValue();
-                    customerCarDetailsBuilder.cleaningStatus(carMap.get("cleaningStatus"));
-                    customerCarDetailsBuilder.serviceType(carMap.get("serviceType"));
-                    customerCarDetailsBuilder.customerId(carMap.get("customerId"));
-                    associateCustomerCarMap.put(carNo, customerCarDetailsBuilder.build());
+//                    CustomerCarDetails.CustomerCarDetailsBuilder customerCarDetailsBuilder = CustomerCarDetails.builder();
+//                    Map<String, String> carMap = associateServiceCarMapEntry.getValue();
+//                    customerCarDetailsBuilder.cleaningStatus(carMap.get("cleaningStatus"));
+//                    customerCarDetailsBuilder.serviceType(carMap.get("serviceType"));
+//                    customerCarDetailsBuilder.customerId(carMap.get("customerId"));
+//                    associateCustomerCarMap.put(carNo, customerCarDetailsBuilder.build());
                 } // end of associateServiceCarMapEntry
                 associateBuilder.associateServiceCarMap(associateCustomerCarMap);
 
@@ -293,7 +293,6 @@ public class FireBaseHelper {
                 ///////
                 ///////
                 writeToCache(associate, mainActivity);
-                Log.i(TAG, "aaaaaa " + associate);
                 mainActivity.populateAssociateContactTextView(associate);
                 recyclerView.setVisibility(View.VISIBLE);
                 emptyView.setVisibility(View.GONE);

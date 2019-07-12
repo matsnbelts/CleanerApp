@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.matsnbeltsassociate.R;
 import com.example.matsnbeltsassociate.model.Associate;
 import com.example.matsnbeltsassociate.model.CustomerCarDetails;
+import com.example.matsnbeltsassociate.utils.CloudStoreHelper;
 import com.example.matsnbeltsassociate.utils.FireBaseHelper;
 import com.google.android.material.snackbar.Snackbar;
 
@@ -26,7 +27,7 @@ public class AssociateAdapter extends RecyclerView.Adapter<AssociateAdapter.MyVi
     public AssociateAdapter(MainActivity mainActivity, Associate associate) {
         this.mMainActivity = mainActivity;
         this.associateServiceCarMap = associate.getAssociateServiceCarMap();
-        mDataset = associateServiceCarMap.keySet().toArray(new String[associateServiceCarMap.size()]);
+        mDataset = associateServiceCarMap.keySet().toArray(new String[0]);
     }
 
     // Create new views (invoked by the layout manager)
@@ -47,7 +48,7 @@ public class AssociateAdapter extends RecyclerView.Adapter<AssociateAdapter.MyVi
         final String carNo = mDataset[position];
         holder.textView.setText(carNo);
         CustomerCarDetails customerCarDetails = associateServiceCarMap.get(carNo);
-        if (!customerCarDetails.getCleaningStatus().equalsIgnoreCase(CustomerCarDetails.CleaningStatus.UNCLEANED)) {
+        if (!customerCarDetails.getCleaningStatus().equalsIgnoreCase(CustomerCarDetails.CleaningStatus.NOT_CLEANED)) {
             holder.cardView.setBackgroundColor(mMainActivity.getResources().getColor(R.color.colorYellow));
 
         }
@@ -64,7 +65,8 @@ public class AssociateAdapter extends RecyclerView.Adapter<AssociateAdapter.MyVi
                 CustomerCarDetails customerCarDetails = associateServiceCarMap.get(carNo);
                 Log.i(TAG, "CARDETAILS: " + customerCarDetails);
                 if (customerCarDetails.getCustomerId() != null) {
-                    FireBaseHelper.getInstance().fetchCustomerDetails(customerCarDetails, carNo, mMainActivity);
+                    //FireBaseHelper.getInstance().fetchCustomerDetails(customerCarDetails, carNo, mMainActivity);
+                    CloudStoreHelper.getInstance().fetchCustomerCarDetails(customerCarDetails, carNo, mMainActivity);
                 } else {
                     Snackbar snackbar = Snackbar
                             .make(mMainActivity.coordinatorLayout, "No customer details found!!!", Snackbar.LENGTH_LONG);
@@ -80,12 +82,13 @@ public class AssociateAdapter extends RecyclerView.Adapter<AssociateAdapter.MyVi
                 Log.i("EditCLickeeddd: ", "ddff" + holder.feedbackText);
                 if (PhoneAuthActivity.isNetworkAvailable(mMainActivity.getApplicationContext())) {
                     CustomerCarDetails customerCarDetails = associateServiceCarMap.get(carNo);
-                    if (!customerCarDetails.getCleaningStatus().equalsIgnoreCase(CustomerCarDetails.CleaningStatus.CLEANED)) {
+                    Log.i(TAG, customerCarDetails.toString());
+                    if (!customerCarDetails.getCleaningStatus().equalsIgnoreCase(CustomerCarDetails.CleaningStatus.NOT_CLEANED)) {
                         Snackbar snackbar = Snackbar
                                 .make(mMainActivity.coordinatorLayout, "Cannot edit finished job", Snackbar.LENGTH_LONG);
                         snackbar.show();
                     } else {
-                        FireBaseHelper.getInstance().finishCleaning(customerCarDetails, carNo, holder, mMainActivity);
+                        CloudStoreHelper.getInstance().finishCleaning(customerCarDetails, carNo, holder, mMainActivity);
                     }
                 } else {
                     Snackbar snackbar = Snackbar
@@ -103,11 +106,11 @@ public class AssociateAdapter extends RecyclerView.Adapter<AssociateAdapter.MyVi
         // each data item is just a string in this case
         TextView textView;
         CardView cardView;
-        protected ImageButton infoButton;
+        ImageButton infoButton;
         ImageButton editButton;
         String feedbackText;
 
-        protected MyViewHolder(View itemView) {
+        MyViewHolder(View itemView) {
             super(itemView);
             cardView = itemView.findViewById(R.id.card_view);
             this.textView = itemView.findViewById(R.id.car_id);

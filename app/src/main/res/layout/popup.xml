@@ -195,7 +195,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="10dp"
                 android:layout_weight="1.0"
-                android:text="City: " />
+                android:text="Pack: " />
 
             <TextView
                 android:id="@+id/car_city"
@@ -214,7 +214,7 @@
         android:gravity="center_horizontal"
         android:text="Loading" />
     <Button
-        android:theme="@style/ThemeOverlay.MyLightButton"
+        android:theme="@style/ThemeOverlay.MyDarkButton"
         android:id="@+id/btnClose"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

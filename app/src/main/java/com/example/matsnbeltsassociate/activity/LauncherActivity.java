@@ -24,10 +24,9 @@ public class LauncherActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
-        getApplicationContext().deleteFile(fileName);
-        writeUserNametoLocalFile("+919952150922");
+//        getApplicationContext().deleteFile(fileName);
+//        writeUserNametoLocalFile("+919952150922");
         String uuId = readFile();
-        Log.i("UUUIDD ", uuId + LauncherActivity.class);
         if (!uuId.isEmpty()) {
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra(EXTRA_MESSAGE, uuId);
@@ -52,26 +51,32 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     private String readFile() {
-        String temp="";
-        if (!InternalStorage.isFilePresent(getApplicationContext(), fileName)) {
-            return temp;
+        StringBuilder temp= new StringBuilder("");
+        if (InternalStorage.isFileNotPresent(getApplicationContext(), fileName)) {
+            return temp.toString();
         }
-        FileInputStream inputStream;
+        FileInputStream inputStream = null;
         try {
             inputStream = openFileInput(fileName);
             int c;
             while( (c = inputStream.read()) != -1){
-                temp = temp + Character.toString((char)c);
+                temp.append((char)c);
             }
-            System.out.println(";;;;;;;;;;" + temp);
             inputStream.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            return temp;
+            if(inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
         }
+        return temp.toString();
     }
     @Override
     public void onBackPressed()

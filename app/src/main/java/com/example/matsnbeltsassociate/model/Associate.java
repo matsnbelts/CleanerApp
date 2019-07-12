@@ -5,10 +5,12 @@ import java.util.Map;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 @Builder
 @Getter
+@Setter
 @ToString
 public class Associate implements Serializable {
     private String name;
@@ -16,6 +18,7 @@ public class Associate implements Serializable {
     private String rating;
     private String serviceArea;
     private String today;
+    private String idProof;
     private Map<String, CustomerCarDetails> associateServiceCarMap;
 
 }
