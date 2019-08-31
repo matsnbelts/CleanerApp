@@ -105,8 +105,8 @@ public class PhoneAuthActivity extends AppCompatActivity implements
             Intent intent = new Intent(getApplicationContext(), NetworkConnectivity.class);
             Log.i("PhoneAuthActivity:::", "No network connection ");
             intent.putExtra(LauncherActivity.EXTRA_MESSAGE, NetworkConnectivity.phoneAuth);
-            startActivity(intent);
             finish();
+            startActivity(intent);
         }
         // Restore instance state
         if (savedInstanceState != null) {
@@ -337,8 +337,8 @@ public class PhoneAuthActivity extends AppCompatActivity implements
             Intent network_intent = new Intent(context, NetworkConnectivity.class);
             Log.i("PhoneAuthActivity:::", "No network connection ");
             network_intent.putExtra(LauncherActivity.EXTRA_MESSAGE, NetworkConnectivity.phoneAuth);
-            startActivity(network_intent);
             finish();
+            startActivity(network_intent);
         }
         // Check if user is signed in (non-null) and update UI accordingly.
         FirebaseUser currentUser = mAuth.getCurrentUser();
@@ -516,8 +516,8 @@ public class PhoneAuthActivity extends AppCompatActivity implements
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             intent.putExtra(LauncherActivity.EXTRA_MESSAGE, mobile);
             Log.i("PhoneAuthActivity:::", "Starting with " + mobile);
-            startActivity(intent);
             finish();
+            startActivity(intent);
         }
     }
 
@@ -563,8 +563,8 @@ public class PhoneAuthActivity extends AppCompatActivity implements
             super.onBackPressed();
             Intent intent = new Intent(this, CloseAppActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
             finish();
+            startActivity(intent);
         }
 
         this.doubleBackToExitPressedOnce = true;

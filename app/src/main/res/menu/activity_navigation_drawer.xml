@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activity.MainActivity"
     tools:showIn="navigation_view">
 
     <group android:checkableBehavior="single">
@@ -26,5 +27,8 @@
                 android:title="@string/menu_supervisor" />
         </menu>
     </item>
-
+    <item
+        android:id="@+id/nav_signout"
+        android:icon="@drawable/ic_menu_slideshow"
+        android:title="@string/sign_out" />
 </menu>

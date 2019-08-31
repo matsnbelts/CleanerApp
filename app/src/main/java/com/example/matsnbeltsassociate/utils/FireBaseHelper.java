@@ -55,7 +55,7 @@ public class FireBaseHelper {
 
     private DatabaseReference getServiceHistoryReference(String carNo) {
         Log.i(TAG, carNo + " :iiii: " + firebaseInstance.toString());
-        return firebaseInstance.getReference("ServiceHistory").child(CommonUtils.today()).child("Cars").child(carNo).getRef();
+        return firebaseInstance.getReference("ServiceHistory").child(CommonUtils.todayString()).child("Cars").child(carNo).getRef();
     }
 
     public DatabaseReference getAssociateReference(String userID) {
@@ -161,7 +161,7 @@ public class FireBaseHelper {
         final boolean isCustomerNotAvailable = ((CheckBox) editCleanView.findViewById(R.id.chkCustomerAvailable)).isChecked();
         String cleanStatus = (!isCustomerNotAvailable) ? CustomerCarDetails.CleaningStatus.CLEANED : CustomerCarDetails.CleaningStatus.CANNOT_BE_CLEANED;
         customerCarDetails.setCleaningStatus(cleanStatus);
-        userIdReference.child("Dates").child(CommonUtils.today()).child("Cars").child(carNo).setValue(customerCarDetails);
+        userIdReference.child("Dates").child(CommonUtils.todayString()).child("Cars").child(carNo).setValue(customerCarDetails);
         holder.getCardView().setBackgroundColor(mainActivity.getResources().getColor(R.color.colorYellow));
         updateCache(customerCarDetails, carNo, mainActivity);
         updateServiceHistory(carNo, editCleanView, mainActivity, holder);
@@ -261,8 +261,8 @@ public class FireBaseHelper {
                 associateBuilder.rating(Long.toString(dataSnapshot.child("rating").getValue(Long.class)));
                 associateBuilder.serviceArea(dataSnapshot.child("serviceArea").getValue(String.class));
 
-                String today = CommonUtils.today();
-                associateBuilder.today(today);
+                String today = CommonUtils.todayString();
+                //associateBuilder.today(today);
                 TextView emptyView = mainActivity.findViewById(R.id.empty_view);
                 RecyclerView recyclerView = mainActivity.findViewById(R.id.my_recycler_view);
                 Log.i(TAG, "today: " + dataSnapshot.child("Dates").child(today).getValue());

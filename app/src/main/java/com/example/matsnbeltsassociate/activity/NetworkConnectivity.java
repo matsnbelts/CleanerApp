@@ -38,8 +38,8 @@ public class NetworkConnectivity extends AppCompatActivity {
                         calledIntent = new Intent(getApplicationContext(), LauncherActivity.class);
                         calledIntent.putExtra(LauncherActivity.ASSOCIATE_ID, intent.getStringExtra(LauncherActivity.ASSOCIATE_ID));
                     }
-                    startActivity(calledIntent);
                     finish();
+                    startActivity(calledIntent);
                 }
             }
         });

@@ -1,20 +1,18 @@
 package com.example.matsnbeltsassociate.activity;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.matsnbeltsassociate.R;
 import com.example.matsnbeltsassociate.model.Associate;
 import com.example.matsnbeltsassociate.model.CustomerCarDetails;
 import com.example.matsnbeltsassociate.utils.CloudStoreHelper;
-import com.example.matsnbeltsassociate.utils.FireBaseHelper;
 import com.google.android.material.snackbar.Snackbar;
 
 import java.util.Map;
@@ -23,8 +21,8 @@ public class AssociateAdapter extends RecyclerView.Adapter<AssociateAdapter.MyVi
     private static final String TAG = "AssociateAdapter";
     private String[] mDataset;
     private MainActivity mMainActivity;
-    private final Map<String, CustomerCarDetails> associateServiceCarMap;
-    public AssociateAdapter(MainActivity mainActivity, Associate associate) {
+    @NonNull private final Map<String, CustomerCarDetails> associateServiceCarMap;
+    public AssociateAdapter(MainActivity mainActivity, @NonNull Associate associate) {
         this.mMainActivity = mainActivity;
         this.associateServiceCarMap = associate.getAssociateServiceCarMap();
         mDataset = associateServiceCarMap.keySet().toArray(new String[0]);
@@ -42,47 +40,32 @@ public class AssociateAdapter extends RecyclerView.Adapter<AssociateAdapter.MyVi
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(final MyViewHolder holder, final int position) {
-        // - get element from your dataset at this position
-        // - replace the contents of the view with that element
+    public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
         final String carNo = mDataset[position];
         holder.textView.setText(carNo);
-        CustomerCarDetails customerCarDetails = associateServiceCarMap.get(carNo);
+        @NonNull CustomerCarDetails customerCarDetails = associateServiceCarMap.get(carNo);
         if (!customerCarDetails.getCleaningStatus().equalsIgnoreCase(CustomerCarDetails.CleaningStatus.NOT_CLEANED)) {
             holder.cardView.setBackgroundColor(mMainActivity.getResources().getColor(R.color.colorYellow));
-
         }
-        holder.textView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Toast.makeText(view.getContext(),"click on item: "+ carNo,Toast.LENGTH_LONG).show();
-            }
-        });
 
         holder.infoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                CustomerCarDetails customerCarDetails = associateServiceCarMap.get(carNo);
-                Log.i(TAG, "CARDETAILS: " + customerCarDetails);
+                @NonNull CustomerCarDetails customerCarDetails = associateServiceCarMap.get(carNo);
                 if (customerCarDetails.getCustomerId() != null) {
-                    //FireBaseHelper.getInstance().fetchCustomerDetails(customerCarDetails, carNo, mMainActivity);
                     CloudStoreHelper.getInstance().fetchCustomerCarDetails(customerCarDetails, carNo, mMainActivity);
                 } else {
                     Snackbar snackbar = Snackbar
                             .make(mMainActivity.coordinatorLayout, "No customer details found!!!", Snackbar.LENGTH_LONG);
                     snackbar.show();
                 }
-//                Intent i = new Intent(v.getContext(), InfoPopupActivity.class);
-//                mMainActivity.startActivity(i);
             }
         });
         holder.editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("EditCLickeeddd: ", "ddff" + holder.feedbackText);
                 if (PhoneAuthActivity.isNetworkAvailable(mMainActivity.getApplicationContext())) {
-                    CustomerCarDetails customerCarDetails = associateServiceCarMap.get(carNo);
-                    Log.i(TAG, customerCarDetails.toString());
+                    @NonNull CustomerCarDetails customerCarDetails = associateServiceCarMap.get(carNo);
                     if (!customerCarDetails.getCleaningStatus().equalsIgnoreCase(CustomerCarDetails.CleaningStatus.NOT_CLEANED)) {
                         Snackbar snackbar = Snackbar
                                 .make(mMainActivity.coordinatorLayout, "Cannot edit finished job", Snackbar.LENGTH_LONG);

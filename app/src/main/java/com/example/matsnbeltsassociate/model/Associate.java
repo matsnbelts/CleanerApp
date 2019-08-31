@@ -1,6 +1,7 @@
 package com.example.matsnbeltsassociate.model;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Map;
 
 import lombok.Builder;
@@ -17,7 +18,7 @@ public class Associate implements Serializable {
     private String email;
     private String rating;
     private String serviceArea;
-    private String today;
+    private Date today;
     private String idProof;
     private Map<String, CustomerCarDetails> associateServiceCarMap;
 

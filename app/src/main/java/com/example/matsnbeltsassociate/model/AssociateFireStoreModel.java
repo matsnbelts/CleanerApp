@@ -13,8 +13,8 @@ public class AssociateFireStoreModel {
     private String email;
     private String mobile;
     private Timestamp doj;
-    private String totalScores;
-    private String totalCustomersRated;
+    private double totalScores;
+    private double totalCustomersRated;
     private String serviceArea;
     private String idProof;
 }

@@ -25,17 +25,18 @@ public class LauncherActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
 //        getApplicationContext().deleteFile(fileName);
-//        writeUserNametoLocalFile("+919952150922");
+//        writeUserNametoLocalFile("Rohit");
         String uuId = readFile();
         if (!uuId.isEmpty()) {
             Intent intent = new Intent(this, MainActivity.class);
             intent.putExtra(EXTRA_MESSAGE, uuId);
+            finish();
             startActivity(intent);
         } else {
             Intent intent = new Intent(this, PhoneAuthActivity.class);
+            finish();
             startActivity(intent);
         }
-        finish();
     }
     private void writeUserNametoLocalFile(String mobile) {
         FileOutputStream outputStream;

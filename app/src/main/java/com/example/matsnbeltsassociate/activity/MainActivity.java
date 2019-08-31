@@ -19,6 +19,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
@@ -41,6 +42,7 @@ import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity
     private Context context;
     private String userId = "";
     private View mProgressView;
+    private FirebaseAuth auth;
 
     public String getAssociateId() {
         return userId;
@@ -66,31 +69,26 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        Log.i("Stop: ", "Stopping");
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Log.i("Start: ", "Starting");
     }
 
     @Override
     protected void onPostResume() {
         super.onPostResume();
-        Log.i("Resume: ", "Resuming");
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.i("Pause: ", "Pausing");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.i("Destroy: ", "Destroying");
     }
 
     @Override
@@ -98,7 +96,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_navigation);
         mProgressView = findViewById(R.id.firestore_progress);
-
+        auth = FirebaseAuth.getInstance();
         ///////////////////////////////////
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -175,8 +173,8 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "Connect to internet");
             network_intent.putExtra(LauncherActivity.EXTRA_MESSAGE, NetworkConnectivity.main);
             network_intent.putExtra(LauncherActivity.ASSOCIATE_ID, userId);
-            startActivity(network_intent);
             finish();
+            startActivity(network_intent);
         }
     }
 
@@ -191,7 +189,7 @@ public class MainActivity extends AppCompatActivity
         associateNameTextView.setText(associate.getName());
         associateRating.setText(associate.getRating());
         TextView associateTodayText = findViewById(R.id.associate_today);
-        associateTodayText.setText(CommonUtils.today());
+        associateTodayText.setText(CommonUtils.todayString());
     }
 
 
@@ -255,10 +253,6 @@ public class MainActivity extends AppCompatActivity
         }
         if (doubleBackToExitPressedOnce) {
             super.onBackPressed();
-//            Intent intent = new Intent(this, CloseAppActivity.class);
-//            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//            startActivity(intent);
-            // finish();
         }
 
         this.doubleBackToExitPressedOnce = true;
@@ -296,7 +290,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull  MenuItem item) {
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -308,6 +302,12 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_supervisor) {
 
+        } else if (id == R.id.nav_signout) {
+            auth.signOut();
+            getApplicationContext().deleteFile(LauncherActivity.fileName);
+            finish();
+            Intent intent = new Intent(this, PhoneAuthActivity.class);
+            startActivity(intent);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

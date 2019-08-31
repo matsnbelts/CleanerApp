@@ -20,6 +20,7 @@ import com.example.matsnbeltsassociate.R;
 import com.example.matsnbeltsassociate.activity.AssociateAdapter;
 import com.example.matsnbeltsassociate.activity.MainActivity;
 import com.example.matsnbeltsassociate.activity.PhoneAuthActivity;
+import com.example.matsnbeltsassociate.constants.CloudStoreConstants;
 import com.example.matsnbeltsassociate.model.Associate;
 import com.example.matsnbeltsassociate.model.AssociateFireStoreModel;
 import com.example.matsnbeltsassociate.model.CustomerCarDetails;
@@ -35,6 +36,8 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.io.IOException;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -51,7 +54,6 @@ public class CloudStoreHelper {
 
     public static CloudStoreHelper getInstance() {
         if(cloudStoreHelper == null) {
-            // Access a Cloud Firestore instance from your Activity
             cloudStoreHelper = new CloudStoreHelper();
         }
         return cloudStoreHelper;
@@ -108,12 +110,15 @@ public class CloudStoreHelper {
         String cleanStatus = (!isCustomerNotAvailable) ? CustomerCarDetails.CleaningStatus.CLEANED : CustomerCarDetails.CleaningStatus.CANNOT_BE_CLEANED;
         customerCarDetails.setCleaningStatus(cleanStatus);
         ////////////
-        db.collection("cars_allocation").document(CommonUtils.today())
-                .collection("cars").document(carNo)
+        Calendar cal = Calendar.getInstance();
+        db.collection(CloudStoreConstants.JOB_ALLOCATION)
+                .document(String.valueOf(cal.get(Calendar.YEAR))).collection(String.valueOf(cal.get(Calendar.MONTH) + 1))
+                .document(String.valueOf(cal.get(Calendar.DAY_OF_MONTH)))
+                .collection(CloudStoreConstants.CARS).document(carNo)
                 .update(
-                        "customerAvailability", !isCustomerNotAvailable,
-                        "cleaningStatus", cleanStatus,
-                        "associateFeedback", ((EditText)editCleanView.findViewById(R.id.associate_feedback)).getText().toString()
+                        CloudStoreConstants.CUSTOMERS_AVAILABILITY, !isCustomerNotAvailable,
+                        CloudStoreConstants.CLEANING_STATUS, cleanStatus,
+                        CloudStoreConstants.ASSOCIATE_FEEDBACK, ((EditText)editCleanView.findViewById(R.id.associate_feedback)).getText().toString()
                 );
         ////////////
         holder.getCardView().setBackgroundColor(mainActivity.getResources().getColor(R.color.colorYellow));
@@ -128,7 +133,7 @@ public class CloudStoreHelper {
             Context context = mainActivity.getApplicationContext();
             InternalStorage.writeObject(context, context.getResources().getString(R.string.associate_file), associate);
         } catch (IOException e) {
-            Log.i("FirebaseHelperLog", e.getMessage());
+            Log.i(TAG, e.getMessage());
             Snackbar snackbar = Snackbar
                     .make(mainActivity.getCoordinatorLayout(), "Something went wrong", Snackbar.LENGTH_LONG);
             snackbar.show();
@@ -136,7 +141,7 @@ public class CloudStoreHelper {
     }
 
     public void fetchCustomerCarDetails(final CustomerCarDetails customerCarDetails, final String carNo, final MainActivity mainActivity) {
-        DocumentReference associateDocRef = db.collection("customers").document(customerCarDetails.getCustomerId());
+        DocumentReference associateDocRef = db.collection(CloudStoreConstants.CUSTOMERS).document(customerCarDetails.getCustomerId());
         associateDocRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -163,8 +168,8 @@ public class CloudStoreHelper {
         });
     }
 
-    public void doesAssociateExist(final String userId, final PhoneAuthActivity phoneAuthActivity) {
-        DocumentReference docRef = db.collection("associates").document(userId);
+    public void doesAssociateExist(@NonNull final String userId, @NonNull final PhoneAuthActivity phoneAuthActivity) {
+        DocumentReference docRef = db.collection(CloudStoreConstants.ASSOCIATES).document(userId);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -184,8 +189,8 @@ public class CloudStoreHelper {
             }
         });
     }
-    public void fetchAssociateDetails(final String userID, final MainActivity mainActivity) {
-        DocumentReference associateDocRef = db.collection("associates").document(userID);
+    public void fetchAssociateDetails(@NonNull final String userID, @NonNull final MainActivity mainActivity) {
+        DocumentReference associateDocRef = db.collection(CloudStoreConstants.ASSOCIATES).document(mainActivity.getAssociateId());
         associateDocRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -223,8 +228,11 @@ public class CloudStoreHelper {
     }
 
     private void fetchAssignedCars(Associate associate, String userID, final MainActivity mainActivity) {
-        db.collection("cars_allocation")
-                .document(associate.getToday()).collection("cars").whereEqualTo("associateId", userID)
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(associate.getToday());
+        db.collection(CloudStoreConstants.JOB_ALLOCATION)
+                .document(String.valueOf(cal.get(Calendar.YEAR))).collection(String.valueOf(cal.get(Calendar.MONTH) + 1))
+        .document(String.valueOf(cal.get(Calendar.DAY_OF_MONTH))).collection(CloudStoreConstants.CARS).whereEqualTo(CloudStoreConstants.ASSOCIATE_ID, userID)
                 .get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -232,7 +240,6 @@ public class CloudStoreHelper {
                 RecyclerView recyclerView = mainActivity.findViewById(R.id.my_recycler_view);
                 if (task.isSuccessful()) {
                     if(task.getResult() == null || task.getResult().size() == 0) {
-                        Log.i(TAG, userID + "today: " + associate.getToday() + task.getResult().size());
                         recyclerView.setVisibility(View.GONE);
                         emptyView.setVisibility(View.VISIBLE);
                         return;
@@ -240,7 +247,6 @@ public class CloudStoreHelper {
                     Map<String, CustomerCarDetails> associateCustomerCarMap = new LinkedHashMap<>();
 
                     for (QueryDocumentSnapshot document : task.getResult()) {
-                        Log.d(TAG, "yyyyyyyyy" + document.getId());
                         associateCustomerCarMap.put(document.getId(), document.toObject(CustomerCarDetails.class));
                     }
                     associate.setAssociateServiceCarMap(associateCustomerCarMap);
@@ -256,7 +262,6 @@ public class CloudStoreHelper {
                     mainActivity.setRecyclerView(associateAdapter);
                 }
                 else {
-                    Log.i(TAG, "today: " + associate.getToday());
                     recyclerView.setVisibility(View.GONE);
                     emptyView.setVisibility(View.VISIBLE);
                 }
@@ -273,15 +278,15 @@ public class CloudStoreHelper {
         associateBuilder.name(associateFireStoreModel.getName());
         associateBuilder.email(associateFireStoreModel.getEmail());
         associateBuilder.serviceArea(associateFireStoreModel.getServiceArea());
-        double associateRating = Double.parseDouble(associateFireStoreModel.getTotalScores()) /
-                Double.parseDouble(associateFireStoreModel.getTotalCustomersRated());
+        double associateRating = associateFireStoreModel.getTotalScores() /
+               associateFireStoreModel.getTotalCustomersRated();
         String associateRatingInString = String.valueOf(associateRating);
         if(Double.isNaN(associateRating)) {
             associateRatingInString = "No Ratings Yet";
         }
         associateBuilder.rating(associateRatingInString);
 
-        String today = CommonUtils.today();
+        Date today = CommonUtils.today().getTime();
         associateBuilder.today(today);
         return associateBuilder.build();
     }

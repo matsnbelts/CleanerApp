@@ -1,8 +1,6 @@
 package com.example.matsnbeltsassociate.services;
 
-import android.app.Notification;
 import android.util.Log;
-
 import com.example.matsnbeltsassociate.activity.MainActivity;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -15,14 +13,12 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.io.IOException;
 
 public class MyFirebaseInstanceService extends FirebaseMessagingService {
-    private static String TAG = "FirebaseMessaging";
+    private static String TAG = "FirebaseInstanceService";
 
 
     @Override
@@ -87,10 +83,9 @@ public class MyFirebaseInstanceService extends FirebaseMessagingService {
             }
 
             @Override public void onResponse(Response response) throws IOException {
-                Log.i(TAG, ":::::" + response.body().string());
                 if (response.isSuccessful()) {
-                    String responseStr = response.body().string();
-                    Log.i("FirebaseHelperLog", responseStr);
+                    final String responseStr = response.body().string();
+                    Log.i("Response Body", responseStr);
                     Snackbar snackbar = Snackbar
                             .make(mainActivity.getCoordinatorLayout(), responseStr + "Push Notification sent to customer", Snackbar.LENGTH_LONG);
                     snackbar.show();
@@ -100,26 +95,6 @@ public class MyFirebaseInstanceService extends FirebaseMessagingService {
                 }
             }
         });
-//        Response response = null;
-//        try {
-//            response = client.newCall(request).execute();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-        // [START send_to_topic]
-        // The topic name can be optionally prefixed with "/topics/".
-
-        // Send a message to the devices subscribed to the provided topic.
-//        String response = null;
-//        Message message = Message.builder()
-//                .putData("score", "850")
-//                .putData("time", "2:45")
-//                .setTopic("srinis")
-//                .build();
-//        FirebaseMessaging fm = FirebaseMessaging.getInstance();
-//        fm.send(message);
-//        // Response is a message ID string.
-//        System.out.println("Successfully sent message: " + response);
          //[END send_to_topic]
     }
 }

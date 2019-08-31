@@ -25,14 +25,14 @@ public final class InternalStorage{
     }
 
     public static boolean checkCacheFileForToday(Context context, final String key) {
-        String current_date = today();
+        String current_date = todayString();
         if(InternalStorage.isFileNotPresent(context, key)) {
             return false;
         }
         try {
             Associate associate = (Associate) readObject(context, key);
             Log.i(TAG, associate.toString());
-            if(associate.getToday() == null || !associate.getToday().equalsIgnoreCase(current_date)) {
+            if(associate.getToday() == null || !dateToString(associate.getToday()).equalsIgnoreCase(current_date)) {
                 context.deleteFile(key);
                 return false;
             }

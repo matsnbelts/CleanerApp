@@ -20,8 +20,19 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            // Enables code shrinking, obfuscation, and optimization for only
+            // your project's release build type.
+            minifyEnabled true
+
+            // Enables resource shrinking, which is performed by the
+            // Android Gradle plugin.
+            shrinkResources true
+            // Includes the default ProGuard rules files that are packaged with
+            // the Android Gradle plugin. To learn more, go to the section about
+            // R8 configuration files.
+            proguardFiles getDefaultProguardFile(
+                    'proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
         }
     }
     compileOptions {
@@ -49,11 +60,23 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test:runner:1.2.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    //androidTestImplementation 'androidx.test.ext:truth:1.2.0'
+    androidTestImplementation ("androidx.test.ext:truth:1.2.0") {
+        exclude group: "com.google.truth", module: "truth"
+    }
+
+    androidTestImplementation ("com.google.truth:truth:0.44") {
+        exclude group: "org.checkerframework", module: "checker-compat-qual"
+        exclude group: "com.google.errorprone", module: "error_prone_annotations"
+        exclude group: "com.google.guava", module: "guava"
+    }
     compileOnly 'org.projectlombok:lombok:1.18.8'
     annotationProcessor 'org.projectlombok:lombok:1.18.8'
     annotationProcessor 'com.google.auto.value:auto-value:1.5.2'
     implementation group: 'com.itextpdf', name: 'io', version: '7.0.2'
     implementation 'com.squareup.okhttp:okhttp:2.7.5'
-    implementation 'com.google.firebase:firebase-firestore:20.1.0'
+    implementation 'com.google.firebase:firebase-firestore:20.2.0'
     implementation 'com.android.support:multidex:1.0.3'
 }
