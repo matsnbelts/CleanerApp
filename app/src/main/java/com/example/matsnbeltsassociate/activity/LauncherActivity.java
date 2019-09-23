@@ -25,7 +25,7 @@ public class LauncherActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_launcher);
 //        getApplicationContext().deleteFile(fileName);
-//        writeUserNametoLocalFile("Rohit");
+//        writeUserNametoLocalFile("+919952150922");
         String uuId = readFile();
         if (!uuId.isEmpty()) {
             Intent intent = new Intent(this, MainActivity.class);

@@ -123,7 +123,7 @@ public class CloudStoreHelper {
         ////////////
         holder.getCardView().setBackgroundColor(mainActivity.getResources().getColor(R.color.colorYellow));
         updateCache(customerCarDetails, carNo, mainActivity);
-        MyFirebaseInstanceService.sendToTopic(mainActivity, customerCarDetails.getCustomerId(), customerCarDetails.getServiceType() );
+        MyFirebaseInstanceService.sendToTopic(mainActivity, customerCarDetails.getCustomerId(), customerCarDetails.getServiceType(), mainActivity.getAssociateName() );
     }
 
     private void updateCache(CustomerCarDetails customerCarDetails, String carNo, MainActivity mainActivity) {

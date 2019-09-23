@@ -62,6 +62,10 @@ public class MainActivity extends AppCompatActivity
         return userId;
     }
 
+    public String getAssociateName() {
+        return associateNameTextView.getText().toString();
+    }
+
     public CoordinatorLayout getCoordinatorLayout() {
         return coordinatorLayout;
     }
