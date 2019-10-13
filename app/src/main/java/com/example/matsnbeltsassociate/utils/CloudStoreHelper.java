@@ -1,7 +1,9 @@
 package com.example.matsnbeltsassociate.utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -47,7 +49,7 @@ public class CloudStoreHelper {
     private static CloudStoreHelper cloudStoreHelper;
     private static final String TAG = "CloudStoreHelper";
     private FirebaseFirestore db;
-
+    public static final int REQUEST_IMAGE_CAPTURE = 1;
     private CloudStoreHelper() {
         db = FirebaseFirestore.getInstance();
     }
@@ -101,11 +103,22 @@ public class CloudStoreHelper {
                 popup.dismiss();
             }
         });
+
+        Button editPhotoButton = editCleanView.findViewById(R.id.editPhoto);
+
+        // Set a click listener for the popup window close button
+        editPhotoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                mainActivity.setCurrentCarPhoto(CommonUtils.todayString() + "/" + carNo + ".jpg");
+                mainActivity.startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+        });
         popup.showAtLocation(mainActivity.getCoordinatorLayout(), Gravity.FILL_HORIZONTAL, 0, 0);
     }
 
     private void updateCleaningStatus(CustomerCarDetails customerCarDetails, String carNo, View editCleanView, final MainActivity mainActivity, AssociateAdapter.MyViewHolder holder) {
-
         final boolean isCustomerNotAvailable = ((CheckBox) editCleanView.findViewById(R.id.chkCustomerAvailable)).isChecked();
         String cleanStatus = (!isCustomerNotAvailable) ? CustomerCarDetails.CleaningStatus.CLEANED : CustomerCarDetails.CleaningStatus.CANNOT_BE_CLEANED;
         customerCarDetails.setCleaningStatus(cleanStatus);
@@ -123,7 +136,10 @@ public class CloudStoreHelper {
         ////////////
         holder.getCardView().setBackgroundColor(mainActivity.getResources().getColor(R.color.colorYellow));
         updateCache(customerCarDetails, carNo, mainActivity);
-        MyFirebaseInstanceService.sendToTopic(mainActivity, customerCarDetails.getCustomerId(), customerCarDetails.getServiceType(), mainActivity.getAssociateName() );
+
+        MyFirebaseInstanceService.sendToTopic(mainActivity, customerCarDetails.getCustomerId(),
+                customerCarDetails.getServiceType(), mainActivity.getAssociateName(),
+                mainActivity.getImgDownloadURL());
     }
 
     private void updateCache(CustomerCarDetails customerCarDetails, String carNo, MainActivity mainActivity) {

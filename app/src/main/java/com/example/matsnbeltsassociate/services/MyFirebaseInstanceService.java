@@ -45,14 +45,24 @@ public class MyFirebaseInstanceService extends FirebaseMessagingService {
         // message, here is where that should be initiated. See sendNotification method below.
     }
 
-    public static void sendToTopic(MainActivity mainActivity, String customerId, String serviceType, String associateName){
+    /***
+     *
+     * @param mainActivity
+     * @param customerId
+     * @param serviceType
+     * @param associateName
+     */
+    public static void sendToTopic(MainActivity mainActivity, String customerId,
+                                   String serviceType, String associateName, String imgPath){
         customerId = customerId.substring(3);
         FirebaseMessaging.getInstance().subscribeToTopic(customerId + "_cleaning_done");
         JSONObject parent = new JSONObject();
         try {
             JSONObject data = new JSONObject();
             data.put("title", "Cleaning Done!!!");
-            data.put("body", "Cleaner " + associateName + " just finished the " + serviceType + " cleaning");
+            data.put("body", "Cleaner " + associateName
+                    + " just finished the " + serviceType + " cleaning\n Image Link " + imgPath);
+            data.put("image", imgPath);
 
             parent.put("notification", data);
             parent.put("to", "/topics/" + customerId + "_cleaning_done");

@@ -74,6 +74,20 @@
                 android:layout_margin="10dp"
                 android:text="Done"
                 android:theme="@style/ThemeOverlay.MyDarkButton" />
+            <Button
+                android:id="@+id/editPhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_margin="10dp"
+                android:background="@drawable/ic_camera_alt_24px"
+                android:theme="@style/ThemeOverlay.MyDarkButton" />
         </LinearLayout>
+    <ImageView
+        android:id="@+id/editImage"
+        android:contentDescription="CarImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
     </LinearLayout>
 </LinearLayout>

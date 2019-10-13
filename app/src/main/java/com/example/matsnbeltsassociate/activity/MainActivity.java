@@ -2,8 +2,11 @@ package com.example.matsnbeltsassociate.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -38,11 +41,23 @@ import com.example.matsnbeltsassociate.utils.CloudStoreHelper;
 import com.example.matsnbeltsassociate.utils.CommonUtils;
 import com.example.matsnbeltsassociate.utils.InternalStorage;
 import com.example.matsnbeltsassociate.utils.LocalDataFetcher;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
+import java.io.ByteArrayOutputStream;
+
+import static com.example.matsnbeltsassociate.utils.CloudStoreHelper.REQUEST_IMAGE_CAPTURE;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -57,6 +72,10 @@ public class MainActivity extends AppCompatActivity
     private String userId = "";
     private View mProgressView;
     private FirebaseAuth auth;
+    private StorageReference mStorage;
+    private ProgressDialog mProgressDialog;
+    private String mCarPhoto = "";
+    private String mImgDownloadURL = "";
 
     public String getAssociateId() {
         return userId;
@@ -101,6 +120,8 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_navigation);
         mProgressView = findViewById(R.id.firestore_progress);
         auth = FirebaseAuth.getInstance();
+        mStorage = FirebaseStorage.getInstance().getReference();
+        mProgressDialog = new ProgressDialog(this);
         ///////////////////////////////////
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -247,6 +268,101 @@ public class MainActivity extends AppCompatActivity
         }
         customerInfoView.findViewById(R.id.loading_customer).setVisibility(View.GONE);
         customerInfoView.findViewById(R.id.customer_details).setVisibility(View.VISIBLE);
+    }
+
+    public void setCurrentCarPhoto(@NonNull String carPhoto) {
+        mCarPhoto = carPhoto;
+    }
+
+    private void setImgDownloadURL(@NonNull String imgDownloadURL) {
+        mImgDownloadURL = imgDownloadURL;
+    }
+
+    public String getImgDownloadURL() {
+        return mImgDownloadURL;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.i("ssss", "requestcodeeeee: " + requestCode + " : " + resultCode + " : " + data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            mProgressDialog.setMessage("Uploading ...");
+            mProgressDialog.show();
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] byteData = baos.toByteArray();
+            StorageReference mountainsRef = mStorage.child(mCarPhoto);
+            UploadTask uploadTask = mountainsRef.putBytes(byteData);
+            Task<Uri> urlTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+
+                    // Continue with the task to get the download URL
+                    return mountainsRef.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        mProgressDialog.dismiss();
+                        Toast.makeText(MainActivity.this, "Uploading finished....",
+                                Toast.LENGTH_LONG).show();
+                        setImgDownloadURL(downloadUri.toString());
+                        Log.i("ddd", downloadUri.toString());
+                    } else {
+                        Toast.makeText(MainActivity.this, "Uploading failed....",
+                                Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+
+//            uploadTask.addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                @Override
+//                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                    mProgressDialog.dismiss();
+//                    Log.i("ddd", taskSnapshot.getUploadSessionUri().toString() +
+//                            taskSnapshot.getMetadata().getName() +
+//                            " : " + taskSnapshot.getMetadata().getReference() +
+//                            " : " + taskSnapshot.getMetadata().getPath() +
+//                            " : " + taskSnapshot.getMetadata().getGeneration() +
+//                            " : " + taskSnapshot.getMetadata().getMetadataGeneration() +
+//                            " : " + taskSnapshot.getMetadata().getMd5Hash() +
+//                            " : " + taskSnapshot.getMetadata().getContentDisposition());
+//                    for(String key:taskSnapshot.getMetadata().getCustomMetadataKeys()) {
+//                        Log.i("ddd", "dddddd: " + key + " :: "
+//                                + taskSnapshot.getMetadata().getCustomMetadata(key));
+//                    }
+//                    Toast.makeText(MainActivity.this, "Uploading finished....", Toast.LENGTH_LONG).show();
+//                    mountainsRef.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+//                        @Override
+//                        public void onSuccess(Uri uri) {
+//                            Log.i("ddd", "------" + uri.getPath());
+//                        }
+//                    }).addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception exception) {
+//                            // Handle any errors
+//                        }
+//                    });
+//                }
+//            }).addOnFailureListener(new OnFailureListener() {
+//                @Override
+//                public void onFailure(@NonNull Exception e) {
+//                    mProgressDialog.dismiss();
+//                    Log.i("ddd", "fffffdddddd: " + extras);
+//
+//                    Toast.makeText(MainActivity.this, "Uploading failed....", Toast.LENGTH_LONG).show();
+//                }
+//            });
+            //((ImageView)findViewById(R.id.editImage)).setImageBitmap(imageBitmap);
+        }
     }
 
     @Override
