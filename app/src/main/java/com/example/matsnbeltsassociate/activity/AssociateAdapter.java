@@ -44,6 +44,9 @@ public class AssociateAdapter extends RecyclerView.Adapter<AssociateAdapter.MyVi
         final String carNo = mDataset[position];
         holder.textView.setText(carNo);
         @NonNull CustomerCarDetails customerCarDetails = associateServiceCarMap.get(carNo);
+        if (!customerCarDetails.getServiceType().equalsIgnoreCase(CustomerCarDetails.ServiceType.INTERIOR)) {
+            holder.cardView.setBackgroundColor(mMainActivity.getResources().getColor(R.color.lightblue));
+        }
         if (!customerCarDetails.getCleaningStatus().equalsIgnoreCase(CustomerCarDetails.CleaningStatus.NOT_CLEANED)) {
             holder.cardView.setBackgroundColor(mMainActivity.getResources().getColor(R.color.colorYellow));
         }
@@ -66,13 +69,15 @@ public class AssociateAdapter extends RecyclerView.Adapter<AssociateAdapter.MyVi
             public void onClick(View v) {
                 if (PhoneAuthActivity.isNetworkAvailable(mMainActivity.getApplicationContext())) {
                     @NonNull CustomerCarDetails customerCarDetails = associateServiceCarMap.get(carNo);
-                    if (!customerCarDetails.getCleaningStatus().equalsIgnoreCase(CustomerCarDetails.CleaningStatus.NOT_CLEANED)) {
-                        Snackbar snackbar = Snackbar
-                                .make(mMainActivity.coordinatorLayout, "Cannot edit finished job", Snackbar.LENGTH_LONG);
-                        snackbar.show();
-                    } else {
-                        CloudStoreHelper.getInstance().finishCleaning(customerCarDetails, carNo, holder, mMainActivity);
-                    }
+                    CloudStoreHelper.getInstance().finishCleaning(customerCarDetails, carNo, holder, mMainActivity);
+
+//                    if (!customerCarDetails.getCleaningStatus().equalsIgnoreCase(CustomerCarDetails.CleaningStatus.NOT_CLEANED)) {
+//                        Snackbar snackbar = Snackbar
+//                                .make(mMainActivity.coordinatorLayout, "Cannot edit finished job", Snackbar.LENGTH_LONG);
+//                        snackbar.show();
+//                    } else {
+//                        CloudStoreHelper.getInstance().finishCleaning(customerCarDetails, carNo, holder, mMainActivity);
+//                    }
                 } else {
                     Snackbar snackbar = Snackbar
                             .make(mMainActivity.coordinatorLayout, "Connect to internet to edit status", Snackbar.LENGTH_LONG);
